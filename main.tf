@@ -1,11 +1,28 @@
-provider "aws" {
-  access_key = "<YOUR_ACCESS_KEY>"
-  secret_key = "<YOUR_SECRET_KEY>"
-  region     = "us-east-1" 
-  endpoint   = "https://s3.wasabisys.com"
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 3.0"
+    }
+  }
 }
 
-# bucket
+provider "aws" {
+  access_key = var.aws_access_key
+  secret_key = var.aws_secret_key
+  region     = "us-east-1"
+}
+
+variable "aws_access_key" {
+  description = "AWS Access Key"
+  type        = string
+}
+
+variable "aws_secret_key" {
+  description = "AWS Secret Key"
+  type        = string
+}
+
 resource "aws_s3_bucket" "sales_data_bucket" {
   bucket = "sales-data-bucket"
 }
@@ -25,8 +42,6 @@ resource "aws_s3_bucket" "finance_data_bucket" {
 resource "aws_s3_bucket" "operations_data_bucket" {
   bucket = "operations-data-bucket"
 }
-
-# policy
 resource "aws_iam_policy" "readonly_policy" {
   name        = "readonly-policy"
   description = "Read-only access to S3 buckets"
@@ -57,7 +72,6 @@ resource "aws_iam_policy" "readwrite_policy" {
   })
 }
 
-# user and policy
 resource "aws_iam_user" "alice" {
   name = "alice"
 }
