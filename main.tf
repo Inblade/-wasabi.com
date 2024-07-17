@@ -1,124 +1,288 @@
 terraform {
   required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = "~> 3.0"
+    wasabi = {
+      source  = "thesisedu/wasabi"
+      version = "4.1.9"
     }
   }
 }
 
-provider "aws" {
-  access_key = var.aws_access_key
-  secret_key = var.aws_secret_key
-  region     = "us-east-1"
+provider "wasabi" {
+  key    = "<your-access-key>"
+  secret = "<your-secret-key>"
+  region = "us-east-1"
 }
 
-variable "aws_access_key" {
-  description = "AWS Access Key"
-  type        = string
-}
-
-variable "aws_secret_key" {
-  description = "AWS Secret Key"
-  type        = string
-}
-
-resource "aws_s3_bucket" "sales_data_bucket" {
+# Создание бакетов
+resource "wasabi_bucket" "sales" {
   bucket = "sales-data-bucket"
 }
 
-resource "aws_s3_bucket" "marketing_data_bucket" {
+resource "wasabi_bucket" "marketing" {
   bucket = "marketing-data-bucket"
 }
 
-resource "aws_s3_bucket" "engineering_data_bucket" {
+resource "wasabi_bucket" "engineering" {
   bucket = "engineering-data-bucket"
 }
 
-resource "aws_s3_bucket" "finance_data_bucket" {
+resource "wasabi_bucket" "finance" {
   bucket = "finance-data-bucket"
 }
 
-resource "aws_s3_bucket" "operations_data_bucket" {
+resource "wasabi_bucket" "operations" {
   bucket = "operations-data-bucket"
 }
-resource "aws_iam_policy" "readonly_policy" {
-  name        = "readonly-policy"
-  description = "Read-only access to S3 buckets"
-  policy      = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect   = "Allow"
-        Action   = ["s3:GetObject", "s3:ListBucket"]
-        Resource = ["arn:aws:s3:::*"]
-      }
-    ]
-  })
+
+# Политики доступа для каждого бакета
+resource "wasabi_policy" "sales_readonly" {
+  name = "sales-readonly-policy"
+  policy = <<POLICY
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": "s3:GetObject",
+      "Resource": "arn:aws:s3:::sales-data-bucket/*"
+    }
+  ]
+}
+POLICY
 }
 
-resource "aws_iam_policy" "readwrite_policy" {
-  name        = "readwrite-policy"
-  description = "Read-write access to S3 buckets"
-  policy      = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect   = "Allow"
-        Action   = ["s3:*"]
-        Resource = ["arn:aws:s3:::*"]
-      }
-    ]
-  })
+resource "wasabi_policy" "sales_readwrite" {
+  name = "sales-readwrite-policy"
+  policy = <<POLICY
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": ["s3:GetObject", "s3:PutObject", "s3:DeleteObject"],
+      "Resource": "arn:aws:s3:::sales-data-bucket/*"
+    }
+  ]
+}
+POLICY
 }
 
-resource "aws_iam_user" "alice" {
+resource "wasabi_policy" "marketing_readonly" {
+  name = "marketing-readonly-policy"
+  policy = <<POLICY
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": "s3:GetObject",
+      "Resource": "arn:aws:s3:::marketing-data-bucket/*"
+    }
+  ]
+}
+POLICY
+}
+
+resource "wasabi_policy" "marketing_readwrite" {
+  name = "marketing-readwrite-policy"
+  policy = <<POLICY
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": ["s3:GetObject", "s3:PutObject", "s3:DeleteObject"],
+      "Resource": "arn:aws:s3:::marketing-data-bucket/*"
+    }
+  ]
+}
+POLICY
+}
+
+resource "wasabi_policy" "engineering_readonly" {
+  name = "engineering-readonly-policy"
+  policy = <<POLICY
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": "s3:GetObject",
+      "Resource": "arn:aws:s3:::engineering-data-bucket/*"
+    }
+  ]
+}
+POLICY
+}
+
+resource "wasabi_policy" "engineering_readwrite" {
+  name = "engineering-readwrite-policy"
+  policy = <<POLICY
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": ["s3:GetObject", "s3:PutObject", "s3:DeleteObject"],
+      "Resource": "arn:aws:s3:::engineering-data-bucket/*"
+    }
+  ]
+}
+POLICY
+}
+
+resource "wasabi_policy" "finance_readonly" {
+  name = "finance-readonly-policy"
+  policy = <<POLICY
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": "s3:GetObject",
+      "Resource": "arn:aws:s3:::finance-data-bucket/*"
+    }
+  ]
+}
+POLICY
+}
+
+resource "wasabi_policy" "finance_readwrite" {
+  name = "finance-readwrite-policy"
+  policy = <<POLICY
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": ["s3:GetObject", "s3:PutObject", "s3:DeleteObject"],
+      "Resource": "arn:aws:s3:::finance-data-bucket/*"
+    }
+  ]
+}
+POLICY
+}
+
+resource "wasabi_policy" "operations_readonly" {
+  name = "operations-readonly-policy"
+  policy = <<POLICY
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": "s3:GetObject",
+      "Resource": "arn:aws:s3:::operations-data-bucket/*"
+    }
+  ]
+}
+POLICY
+}
+
+resource "wasabi_policy" "operations_readwrite" {
+  name = "operations-readwrite-policy"
+  policy = <<POLICY
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": ["s3:GetObject", "s3:PutObject", "s3:DeleteObject"],
+      "Resource": "arn:aws:s3:::operations-data-bucket/*"
+    }
+  ]
+}
+POLICY
+}
+
+# Создание пользователей
+resource "wasabi_user" "alice" {
   name = "alice"
 }
 
-resource "aws_iam_user_policy_attachment" "alice_rw_sales" {
-  user       = aws_iam_user.alice.name
-  policy_arn = aws_iam_policy.readwrite_policy.arn
+resource "wasabi_user_policy_attachment" "alice_sales_rw" {
+  user       = wasabi_user.alice.name
+  policy_arn = wasabi_policy.sales_readwrite.arn
 }
 
-resource "aws_iam_user_policy_attachment" "alice_rw_marketing" {
-  user       = aws_iam_user.alice.name
-  policy_arn = aws_iam_policy.readwrite_policy.arn
+resource "wasabi_user_policy_attachment" "alice_marketing_rw" {
+  user       = wasabi_user.alice.name
+  policy_arn = wasabi_policy.marketing_readwrite.arn
 }
 
-resource "aws_iam_user_policy_attachment" "alice_ro_engineering" {
-  user       = aws_iam_user.alice.name
-  policy_arn = aws_iam_policy.readonly_policy.arn
+resource "wasabi_user_policy_attachment" "alice_engineering_ro" {
+  user       = wasabi_user.alice.name
+  policy_arn = wasabi_policy.engineering_readonly.arn
 }
 
-resource "aws_iam_user" "bob" {
+resource "wasabi_user" "bob" {
   name = "bob"
 }
 
-resource "aws_iam_user_policy_attachment" "bob_rw_all" {
-  user       = aws_iam_user.bob.name
-  policy_arn = aws_iam_policy.readwrite_policy.arn
+resource "wasabi_user_policy_attachment" "bob_sales_rw" {
+  user       = wasabi_user.bob.name
+  policy_arn = wasabi_policy.sales_readwrite.arn
 }
 
-resource "aws_iam_user" "charlie" {
+resource "wasabi_user_policy_attachment" "bob_marketing_rw" {
+  user       = wasabi_user.bob.name
+  policy_arn = wasabi_policy.marketing_readwrite.arn
+}
+
+resource "wasabi_user_policy_attachment" "bob_engineering_rw" {
+  user       = wasabi_user.bob.name
+  policy_arn = wasabi_policy.engineering_readwrite.arn
+}
+
+resource "wasabi_user_policy_attachment" "bob_finance_rw" {
+  user       = wasabi_user.bob.name
+  policy_arn = wasabi_policy.finance_readwrite.arn
+}
+
+resource "wasabi_user_policy_attachment" "bob_operations_rw" {
+  user       = wasabi_user.bob.name
+  policy_arn = wasabi_policy.operations_readwrite.arn
+}
+
+resource "wasabi_user" "charlie" {
   name = "charlie"
 }
 
-resource "aws_iam_user_policy_attachment" "charlie_rw_operations" {
-  user       = aws_iam_user.charlie.name
-  policy_arn = aws_iam_policy.readwrite_policy.arn
+resource "wasabi_user_policy_attachment" "charlie_operations_rw" {
+  user       = wasabi_user.charlie.name
+  policy_arn = wasabi_policy.operations_readwrite.arn
 }
 
-resource "aws_iam_user_policy_attachment" "charlie_ro_finance" {
-  user       = aws_iam_user.charlie.name
-  policy_arn = aws_iam_policy.readonly_policy.arn
+resource "wasabi_user_policy_attachment" "charlie_finance_ro" {
+  user       = wasabi_user.charlie.name
+  policy_arn = wasabi_policy.finance_readonly.arn
 }
 
-resource "aws_iam_user" "backup" {
+resource "wasabi_user" "backup" {
   name = "backup"
 }
 
-resource "aws_iam_user_policy_attachment" "backup_ro_all" {
-  user       = aws_iam_user.backup.name
-  policy_arn = aws_iam_policy.readonly_policy.arn
+resource "wasabi_user_policy_attachment" "backup_sales_ro" {
+  user       = wasabi_user.backup.name
+  policy_arn = wasabi_policy.sales_readonly.arn
+}
+
+resource "wasabi_user_policy_attachment" "backup_marketing_ro" {
+  user       = wasabi_user.backup.name
+  policy_arn = wasabi_policy.marketing_readonly.arn
+}
+
+resource "wasabi_user_policy_attachment" "backup_engineering_ro" {
+  user       = wasabi_user.backup.name
+  policy_arn = wasabi_policy.engineering_readonly.arn
+}
+
+resource "wasabi_user_policy_attachment" "backup_finance_ro" {
+  user       = wasabi_user.backup.name
+  policy_arn = wasabi_policy.finance_readonly.arn
+}
+
+resource "wasabi_user_policy_attachment" "backup_operations_ro" {
+  user       = wasabi_user.backup.name
+  policy_arn = wasabi_policy.operations_readonly.arn
 }
